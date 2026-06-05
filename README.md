@@ -163,14 +163,110 @@ gh auth setup-git
 
 ### 3.1 环境变量方式
 
-在系统环境变量或 Claude Code 的 settings.json 中设置：
+将 Token 设置为系统环境变量 `GITHUB_TOKEN`，这样 `gh`、Git、以及其他工具都能自动读取。
+
+#### Windows（图形界面）
+
+<details>
+<summary>点击展开详细步奏</summary>
+
+1. 按键盘 **Win** 键，搜索 **"环境变量"**
+2. 选择 **"编辑系统环境变量"**
+3. 在弹出的"系统属性"窗口中，点击右下角的 **"环境变量..."** 按钮
+4. 在 **"用户变量"** 区域，点击 **"新建"**
+5. 填写变量信息：
+   - **变量名**：`GITHUB_TOKEN`
+   - **变量值**：`github_pat_你的_超长_令牌_字符串`
+6. 一路点击 **"确定"** 保存所有窗口
+7. **重启你的终端或 VS Code**，否则新变量不会生效
+
+> 💡 如果想验证是否设置成功，打开新终端执行：
+> ```cmd
+> echo %GITHUB_TOKEN%
+> ```
+> 如果能正常输出你的 Token，说明配置成功。
+
+</details>
+
+#### macOS
+
+<details>
+<summary>点击展开详细步奏</summary>
+
+**方式一：通过 `.zshrc` 永久配置（推荐）**
 
 ```bash
-# Windows 用户变量
-GITHUB_TOKEN=你的Token
+# 1. 编辑 shell 配置文件
+echo 'export GITHUB_TOKEN="github_pat_你的_超长_令牌_字符串"' >> ~/.zshrc
 
-# 或者临时设置
-export GITHUB_TOKEN=你的Token
+# 2. 重新加载配置
+source ~/.zshrc
+
+# 3. 验证
+echo $GITHUB_TOKEN
+```
+
+**方式二：通过 `~/.config/.env` 统一管理环境变量**
+
+```bash
+# 1. 创建或编辑配置文件
+echo 'export GITHUB_TOKEN="github_pat_你的_超长_令牌_字符串"' >> ~/.config/.env
+
+# 2. 在 .zshrc 中加载
+echo 'source ~/.config/.env' >> ~/.zshrc
+
+# 3. 重新加载
+source ~/.zshrc
+```
+
+> 💡 重启终端或执行 `source ~/.zshrc` 后，新变量才会生效。
+
+</details>
+
+#### Linux
+
+<details>
+<summary>点击展开详细步奏</summary>
+
+**方式一：通过 `.bashrc` 永久配置（推荐）**
+
+```bash
+# 1. 编辑 shell 配置文件（根据你的 shell 选择）
+echo 'export GITHUB_TOKEN="github_pat_你的_超长_令牌_字符串"' >> ~/.bashrc
+# 如果使用 zsh
+echo 'export GITHUB_TOKEN="github_pat_你的_超长_令牌_字符串"' >> ~/.zshrc
+
+# 2. 重新加载配置
+source ~/.bashrc  # 或 source ~/.zshrc
+
+# 3. 验证
+echo $GITHUB_TOKEN
+```
+
+**方式二：写入 `/etc/environment`（全局生效，需要 sudo）**
+
+```bash
+# 所有用户都能读取（谨慎使用）
+echo 'GITHUB_TOKEN="github_pat_你的_超长_令牌_字符串"' | sudo tee -a /etc/environment
+
+# 重启后生效
+```
+
+> 💡 重启终端或执行 `source` 后，新变量才会生效。
+
+</details>
+
+#### 临时设置（所有系统，仅当前会话有效）
+
+```bash
+# Windows (CMD)
+set GITHUB_TOKEN=github_pat_你的Token
+
+# Windows (PowerShell)
+$env:GITHUB_TOKEN="github_pat_你的Token"
+
+# macOS / Linux
+export GITHUB_TOKEN="github_pat_你的Token"
 ```
 
 ### 3.2 Git 凭据方式
