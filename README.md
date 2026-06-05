@@ -348,107 +348,129 @@ git config --global url."git@github.com:".insteadOf "https://github.com/"
 
 ## 5. 实战：创建并推送一个仓库
 
-以下是完整的操作流程，从零开始创建一个仓库并推送到 GitHub。
+以下是你需要在终端中逐条执行的命令。
 
 ### 5.1 创建本地项目
 
+打开终端，逐条输入：
+
 ```bash
-# 创建项目目录
+# 1. 创建一个新目录作为项目文件夹
 mkdir my-project
+# 2. 进入该目录
 cd my-project
 
-# 初始化 Git
+# 3. 初始化 Git 仓库（生成 .git 目录）
 git init
 
-# 创建一些文件
+# 4. 创建两个简单文件
 echo "# My Project" > README.md
 echo "console.log('Hello GitHub!');" > index.js
 
-# 提交
+# 5. 暂存所有文件并提交
 git add -A
 git commit -m "Initial commit"
 ```
 
-### 5.2 创建远程仓库并推送
+> 💡 **原理**：`git init` 在当前目录创建一个空的 Git 仓库（生成 `.git` 隐藏目录）；`git add -A` 把所有文件放入暂存区；`git commit` 把它们正式记录为一个版本。
+
+### 5.2 一键创建远程仓库并推送（推荐）
 
 ```bash
-# 使用 gh 一键创建仓库并推送（最方便）
 gh repo create my-project --public --source=. --remote=origin --push
-
-# 参数说明：
-#   --public    创建公开仓库（也可用 --private）
-#   --source=.  使用当前目录作为本地源
-#   --remote    自动添加名为 origin 的远程
-#   --push      创建后自动推送
 ```
 
-### 5.3 分步操作（如果你想手动控制）
+这条命令帮你干了三件事：
+
+| 参数 | 做了什么 |
+|------|---------|
+| `--source=.` | 把当前目录作为仓库内容 |
+| `--remote=origin` | 自动添加名为 `origin` 的远程地址 |
+| `--push` | 把本地代码推送到 GitHub |
+
+完成后打开 `https://github.com/你的用户名/my-project` 就能看到了。
+
+### 5.3 如果你想分步操作（了解背后原理）
 
 ```bash
-# 1. 仅创建远程仓库（空仓库）
+# 第一步：在 GitHub 上创建一个空仓库
 gh repo create my-project --public
 
-# 2. 添加远程
-git remote add origin git@github.com:用户名/my-project.git
+# 第二步：手动关联本地仓库与远程
+git remote add origin git@github.com:你的用户名/my-project.git
 
-# 3. 推送
+# 第三步：手动推送
 git push -u origin main
 ```
 
 ### 5.4 验证
 
 ```bash
-# 查看远程仓库信息
-gh repo view 用户名/my-project --json name,url,createdAt
+# 查看远程仓库的详细信息
+gh repo view 你的用户名/my-project --json name,url,createdAt
+# 输出示例：
+# {"createdAt":"2026-06-05T14:17:18Z","name":"my-project","url":"https://github.com/你的用户名/my-project"}
 ```
 
 ---
 
 ## 6. 实战：修改已有仓库的代码
 
-### 6.1 克隆已有仓库
+把你 GitHub 上已有的仓库克隆到本地，修改后再推送回去。
+
+### 6.1 克隆仓库到本地
 
 ```bash
-# SSH 方式（推荐）
-git clone git@github.com:用户名/仓库名.git
+# SSH 方式（推荐，中国网络更稳定）
+git clone git@github.com:你的用户名/仓库名.git
 cd 仓库名
 
-# HTTPS 方式
-git clone https://github.com/用户名/仓库名.git
+# 或者 HTTPS 方式（网络畅通时可用）
+git clone https://github.com/你的用户名/仓库名.git
 ```
 
-### 6.2 修改 → 提交 → 推送
+> 💡 **原理**：`git clone` 会把远程仓库的完整历史下载到本地，并自动关联远程地址。用 SSH 还是 HTTPS 取决于你的网络环境和偏好。
+
+### 6.2 修改文件 → 提交 → 推送
 
 ```bash
-# 修改文件
-echo "新内容" >> README.md
+# 1. 编辑文件（这里以 README.md 为例）
+echo "这是新增的内容" >> README.md
 
-# 添加并提交
+# 2. 查看当前修改状态
+git status
+# 输出会显示哪些文件被改动了
+
+# 3. 暂存并提交
 git add -A
 git commit -m "feat: 更新 README"
 
-# 推送
+# 4. 推送到 GitHub
 git push origin main
 ```
 
-### 6.3 在 Claude Code 中操作
+> 💡 **原理**：`git status` 查看改动 → `git add` 把改动放入暂存区 → `git commit` 记录为一个版本 → `git push` 把本地新版本上传到 GitHub。
 
-在 Claude Code 会话中，可以直接对它说：
+### 6.3 让 Claude Code 帮你操作
+
+在 Claude Code 会话中，你只需要用自然语言描述需求：
 
 > "帮我修改 README.md，增加使用说明"
 > "提交并推送到 GitHub"
 
-它会自动执行 `git add`、`git commit`、`git push`。
+Claude Code 会自动执行 `git add`、`git commit`、`git push`，你不需要手动输入任何 Git 命令。
+
+> ⚠️ 前提是你的环境变量 `GITHUB_TOKEN` 已配置，或者 Claude Code 能通过 `gh` CLI 认证访问 GitHub。
 
 ---
 
 ## 7. 实战：启用 GitHub Pages
 
-想要让项目变成一个可访问的网页？GitHub Pages 可以免费托管静态网站。
+把仓库变成一个可以直接访问的网页，完全免费。
 
 ### 7.1 准备网页文件
 
-在仓库根目录创建 `index.html`：
+在仓库根目录创建一个 `index.html`：
 
 ```html
 <!DOCTYPE html>
@@ -460,35 +482,48 @@ git push origin main
 </html>
 ```
 
-### 7.2 通过 gh 启用 Pages
+> 💡 **原理**：GitHub Pages 会自动识别仓库根目录下的 `index.html` 作为首页。你也可以放 `style.css`、`script.js` 等静态文件。
+
+### 7.2 启用 Pages
+
+**方法一：命令行（推荐，1 秒搞定）**
 
 ```bash
-# 方式一：使用 GitHub API
+# 把 main 分支的根目录作为 Pages 源
 echo '{"source":{"branch":"main","path":"/"}}' | \
-  gh api repos/用户名/仓库名/pages --input -
-
-# 方式二：在网页端设置
-# 仓库 → Settings → Pages → 选择 main 分支 → Save
+  gh api repos/你的用户名/仓库名/pages --input -
 ```
 
-### 7.3 访问页面
+**方法二：网页端操作**
 
 ```
-https://用户名.github.io/仓库名/
+在浏览器打开你的仓库 → 点 Settings → 左侧 Pages →
+Source 选 "Deploy from a branch" → Branch 选 "main" → / (root) → Save
 ```
 
-部署通常需要 **1-2 分钟**，可以用以下命令检查状态：
+### 7.3 访问你的页面
+
+```
+https://你的用户名.github.io/仓库名/
+```
+
+部署一般需要 **1-2 分钟**。用这条命令可以查看部署状态：
 
 ```bash
-gh api repos/用户名/仓库名/pages --jq '.status'
-# building → deployed
+gh api repos/你的用户名/仓库名/pages --jq '.status'
+# 返回 "building" → 正在部署，稍等再查
+# 返回 "deployed" → 部署完成，可以访问了
 ```
 
-### 7.4 在 README 中添加链接
+### 7.4 把链接加到 README
+
+编辑 `README.md`，加上这一行：
 
 ```markdown
-🌐 **在线演示**: [https://用户名.github.io/仓库名/](https://用户名.github.io/仓库名/)
+🌐 **在线演示**: [https://你的用户名.github.io/仓库名/](https://你的用户名.github.io/仓库名/)
 ```
+
+提交并推送后，别人打开你的仓库首页就能直接看到访问入口。
 
 ---
 
