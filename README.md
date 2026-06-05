@@ -168,7 +168,7 @@ gh auth setup-git
 #### Windows（图形界面）
 
 <details>
-<summary>点击展开详细步奏</summary>
+<summary>点击展开详细步骤</summary>
 
 1. 按键盘 **Win** 键，搜索 **"环境变量"**
 2. 选择 **"编辑系统环境变量"**
@@ -191,7 +191,7 @@ gh auth setup-git
 #### macOS
 
 <details>
-<summary>点击展开详细步奏</summary>
+<summary>点击展开详细步骤</summary>
 
 **方式一：通过 `.zshrc` 永久配置（推荐）**
 
@@ -226,7 +226,7 @@ source ~/.zshrc
 #### Linux
 
 <details>
-<summary>点击展开详细步奏</summary>
+<summary>点击展开详细步骤</summary>
 
 **方式一：通过 `.bashrc` 永久配置（推荐）**
 
