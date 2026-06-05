@@ -60,14 +60,16 @@ git config --global --unset http.proxy
 git config --global --unset https.proxy
 ```
 
-### 方案三：使用镜像加速
+### 方案三：使用镜像加速（可用性不确定）
+
+> ⚠️ 以下镜像站为社区维护，**可能已停止服务或不再更新**。使用前请自行验证可用性。
 
 ```bash
-# 使用镜像站克隆（仅限克隆，推送仍需 SSH 或原地址）
-git clone https://github.com.cnpmjs.org/用户名/仓库名.git
+# 尝试使用镜像站克隆（仅限克隆，推送仍需 SSH 或原地址）
+git clone https://ghproxy.com/https://github.com/用户名/仓库名.git
 
-# 或使用 fastgit 镜像
-git clone https://hub.fastgit.xyz/用户名/仓库名.git
+# 或搜索最新的 GitHub 加速镜像
+# 关键词: "GitHub 镜像站" "GitHub 加速"
 ```
 
 ---

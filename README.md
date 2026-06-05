@@ -106,14 +106,6 @@ gh --version
 
 > 仅在国内网络 `gh auth login` 网页认证失败时使用。Classic Token 的 `repo` 作用域会访问**所有仓库**，建议用完后吊销。
 
-```bash
-# 打开 Token 设置页面
-# https://github.com/settings/tokens
-
-# GitHub CLI 的 gh auth login 在某些网络环境可能打不开网页
-# 备选方案：使用 Classic Token 认证（虽然权限偏高但兼容性好）
-```
-
 1. 打开 [Classic Token 设置页面](https://github.com/settings/tokens)
 2. 点击 **Generate new token** → **Generate new token (classic)**
 3. 填写 Note（如 `claude-code-token`）
@@ -387,6 +379,8 @@ gh repo create my-project --public --source=. --remote=origin --push
 | `--push` | 把本地代码推送到 GitHub |
 
 完成后打开 `https://github.com/你的用户名/my-project` 就能看到了。
+
+> ⚠️ `gh repo create --push` 默认走 HTTPS。如果你在中国大陆网络环境且未配置代理，推送可能失败。解决：先 SSH 登录 GitHub CLI（`gh auth login`），或推送前执行 `git remote set-url origin git@github.com:你的用户名/my-project.git` 切换到 SSH。
 
 ### 5.3 如果你想分步操作（了解背后原理）
 
