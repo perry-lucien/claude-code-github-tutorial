@@ -124,8 +124,6 @@ gh --version
 5. 点击 **Generate token**
 6. **立即复制并保存**（关闭后无法再次查看，以 `ghp_` 开头）
 
-![Classic Token 权限选择示意](https://docs.github.com/assets/cb-34501/images/help/token/gh-token-repo-perms.png)
-
 ### 2.3 登录认证
 
 Fine-grained PAT（`github_pat_`）和 Classic Token（`ghp_`）的认证方式一样：
