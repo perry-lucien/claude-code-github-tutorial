@@ -33,6 +33,8 @@ else
     echo "⚠️  GitHub CLI 未登录，请选择登录方式:"
     echo ""
     echo "   [1] 使用 Token 登录（推荐，中国网络友好）"
+    echo "       - Fine-grained PAT (github_pat_...) ← 推荐，权限可控"
+    echo "       - Classic Token  (ghp_...)          ← 备选，权限较高"
     echo "   [2] 打开浏览器登录"
     echo ""
     read -p "   请选择 [1/2]: " choice

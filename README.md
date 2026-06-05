@@ -69,36 +69,79 @@ gh --version
 # 输出示例: gh version 2.52.0
 ```
 
-### 2.2 创建 GitHub Classic Token
+### 2.2 创建 Token
 
-> ⚠️ **注意**：在国内网络环境下，部分用户可能会遇到 `gh auth login` 网页认证失败的情况。推荐使用 **Classic Token** 方式认证。
+> 🔒 推荐使用 **Fine-grained PAT（细粒度令牌）**，可以精确控制权限范围，只给本次需要的仓库和操作授权。
+> 相比之下，Classic Token 的 `repo` 作用域会放权给**你名下所有仓库**，风险较高。
 
-1. 打开 [GitHub Token 设置页面](https://github.com/settings/tokens)
+#### 2.2.1 创建 Fine-grained PAT（推荐）
+
+1. 打开 [Fine-grained tokens 设置页面](https://github.com/settings/tokens?type=beta)
+2. 点击 **Generate new token**
+3. 填写以下信息：
+
+   | 字段 | 建议值 |
+   |------|--------|
+   | **Token name** | `claude-code` 或描述性名称 |
+   | **Expiration** | 30~90 天（建议选 `Custom` 设定具体天数） |
+   | **Description** | 可选，方便日后识别 |
+
+4. **Repository access** → 选择 **Only select repositories**
+   - 在弹出的搜索框中勾选 Claude Code 需要操作的仓库
+   - > ⚠️ 如果涉及 `gh repo create` 新建仓库，需要临时选择 **All repositories**（因为仓库还没创建出来，无法预先勾选），用完后换回限制模式
+5. **Permissions** → 设置精细权限：
+
+   | 权限分类 | 权限级别 | 用途 |
+   |---------|---------|------|
+   | **Contents** | Read and write | 读写仓库代码（推送必备） |
+   | **Metadata** | Read（自动勾选） | 读取仓库元数据（必选） |
+   | **Pull requests** | Read and write | 管理 PR（按需） |
+   | **Issues** | Read and write | 管理 Issue（按需） |
+   | **Workflows** | Read and write | 推送 `.github/workflows/` 变更（按需） |
+
+6. 点击 **Generate new token**
+7. **立即复制 Token**（以 `github_pat_` 开头，关闭页面后无法再次查看）
+
+#### 2.2.2 使用 Classic Token（备选，权限较高）
+
+> 仅在国内网络 `gh auth login` 网页认证失败时使用。Classic Token 的 `repo` 作用域会访问**所有仓库**，建议用完后吊销。
+
+```bash
+# 打开 Token 设置页面
+# https://github.com/settings/tokens
+
+# GitHub CLI 的 gh auth login 在某些网络环境可能打不开网页
+# 备选方案：使用 Classic Token 认证（虽然权限偏高但兼容性好）
+```
+
+1. 打开 [Classic Token 设置页面](https://github.com/settings/tokens)
 2. 点击 **Generate new token** → **Generate new token (classic)**
 3. 填写 Note（如 `claude-code-token`）
 4. 勾选以下权限作用域：
-   - `repo` —— 完全控制私有仓库（**必须**）
-   - `read:org` —— 读取组织信息（可选，建议勾选）
-   - `workflow` —— 管理 GitHub Actions（需要时勾选）
+   - `repo` —— 完全控制私有仓库（**必须**，注意这会给你**所有仓库**的完全权限）
+   - `read:org` —— 读取组织信息（可选）
+   - `workflow` —— 管理 GitHub Actions（按需）
 5. 点击 **Generate token**
-6. **立即复制并保存 Token**（关闭页面后无法再次查看）
+6. **立即复制并保存**（关闭后无法再次查看，以 `ghp_` 开头）
 
-![Token 权限选择示意](https://docs.github.com/assets/cb-34501/images/help/token/gh-token-repo-perms.png)
+![Classic Token 权限选择示意](https://docs.github.com/assets/cb-34501/images/help/token/gh-token-repo-perms.png)
 
 ### 2.3 登录认证
+
+Fine-grained PAT（`github_pat_`）和 Classic Token（`ghp_`）的认证方式一样：
 
 ```bash
 # 使用 Token 登录（推荐，国内网络友好）
 gh auth login --with-token < 你的Token文件路径
 # 或手动输入
-echo "你的_ghp_Token" | gh auth login --with-token
+echo "你的_Token" | gh auth login --with-token
 
 # 验证登录状态
 gh auth status
 # ✓ Logged in to github.com account your-username (GITHUB_TOKEN)
 # ✓ Active account: true
 # ✓ Git operations protocol: https
-# ✓ Token: ghp_************************************
+# ✓ Token: ghp_************************************ 或 github_pat_************
 # ✓ Token scopes: 'repo'
 ```
 
@@ -111,9 +154,12 @@ gh auth setup-git
 
 ---
 
-## 3. 方案二：Personal Access Token
+## 3. 方案二：直接使用 Token（不安装 gh）
 
-如果你不想安装 GitHub CLI，也可以直接用 Token 操作。
+如果你不想安装 GitHub CLI，也可以直接用 Token 操作 Git。
+
+> ⚠️ 注意：Fine-grained PAT 和 Classic Token 都可用于此方案。
+> Fine-grained PAT 以 `github_pat_` 开头，Classic Token 以 `ghp_` 开头。
 
 ### 3.1 环境变量方式
 
@@ -121,20 +167,31 @@ gh auth setup-git
 
 ```bash
 # Windows 用户变量
-GITHUB_TOKEN=ghp_你的Token
+GITHUB_TOKEN=你的Token
 
 # 或者临时设置
-export GITHUB_TOKEN=ghp_你的Token
+export GITHUB_TOKEN=你的Token
 ```
 
 ### 3.2 Git 凭据方式
 
 ```bash
-# 全局配置
+# 全局配置（Token 会被明文存储，注意安全）
 git config --global credential.helper store
-# 也可以使用 manager 模式（Windows 推荐）
+
+# 也可以使用 manager 模式（Windows 推荐，凭据加密存储）
 git config --global credential.helper manager-core
 ```
+
+### 3.3 Fine-grained PAT vs Classic Token 对比
+
+| 对比项 | Fine-grained PAT | Classic Token |
+|--------|:-:|:-:|
+| 前缀 | `github_pat_` | `ghp_` |
+| 权限粒度 | 分类级别精细控制 | 粗粒度作用域 |
+| 仓库范围 | 可限制到特定仓库 | 全部仓库 |
+| 过期时间 | 强制设置 | 可选 |
+| 推荐程度 | ⭐ 推荐 | ⚠️ 备选 |
 
 ---
 
@@ -423,9 +480,13 @@ git push origin main
 ```bash
 # ===== 认证相关 =====
 gh auth status                          # 查看登录状态
-gh auth login --with-token < token.txt  # Token 登录
+gh auth login --with-token < token.txt  # Token 登录（支持 fine-grained 和 classic）
 gh auth setup-git                       # 配置 Git 凭据
 ssh -T git@github.com                   # 测试 SSH 连接
+
+# ===== Token 管理（网页端） =====
+# Fine-grained PAT: https://github.com/settings/tokens?type=beta
+# Classic Token:    https://github.com/settings/tokens
 
 # ===== 仓库操作 =====
 gh repo create 仓库名 --public --source=. --push
